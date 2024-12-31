@@ -54,10 +54,10 @@ jobs:
           path: ./build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v3              #we are using this package for deployment on gitgub pages  
         with:
-          github_token: ${{ secrets.TOKEN }}
-          publish_dir: ./build
+          github_token: ${{ secrets.TOKEN }}            #token is needed for deployment (github repo token)
+          publish_dir: ./build                          #which folder u want to initiate the deployment 
                                                                     
 
                                                                   
