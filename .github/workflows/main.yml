@@ -1,0 +1,63 @@
+name: Build & Deploy                                                #Workflow name
+
+on: 
+  push:
+    branches:                                                       #trigger point
+      - main                                                        #if anything new get commited in main branch, pipeline will get auto triggered
+      - release
+
+env:
+  CI: false                                                         #will ignore any warnings if present
+                                                                    #by default: true
+                                                                    #in prod, warnings are important, either give true value or do not mntion anything as by default value is true.
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubantu-latest                                          #server to run build process
+
+    steps:
+      - name: Checkout repo                                         
+        uses: actions/checkout@v2                                   #inbuild pkg to checkout the code present the repo
+                                                                    # to run test case command will be-  maven/ cleantest
+
+      - name: Setup Node                                            #
+        uses: actions/setup-node@v1                                 #this pkg will run node version 16
+        with:
+          node-version: 16
+
+      - name: Install dependencies                                  
+        uses: bahmutov/npm-install@v1                               #to cache the dependencies after downloading, so when workflow will run in repeat manner, this package will take care of the dependencies from cache instead of installing those again.
+
+      - name: Build project                                         
+        run: npm run build
+        env:
+            Logic_app_client_id: ${{ secrets.Logic_app_client_id }}
+
+      - name: Upload production-ready build files            #upload build folder data to cloud
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-files
+          path: ./build
+
+  deploy:
+    name: Deploy
+    needs: build                                        #needs is used for atleast the above 'build' task should be completed successfully then only it will proceed
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: production-files
+          path: ./build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          publish_dir: ./build
+                                                                    
+
+                                                                  
