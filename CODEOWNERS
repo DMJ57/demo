@@ -1,1 +1,11 @@
+# This is the list of reviewers to approve anything in this repo
 
+* @DMJ57
+
+# approve only json files
+
+* .js @DMJ57
+
+# target specific folder
+
+/docs/* @DMJ57
